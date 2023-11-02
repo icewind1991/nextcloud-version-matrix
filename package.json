@@ -2,8 +2,9 @@
   "name": "nextcloud-version-matrix",
   "version": "1.0.0",
   "description": "Generate nextcloud version matrix for an app",
-  "main": "index.js",
+  "main": "src/action.js",
   "scripts": {
+    "build": "ncc build src/action.js -o dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -14,5 +15,8 @@
     "url-exist": "^2.0.2",
     "xmldom": "^0.6.0",
     "xpath": "0.0.27"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.38.1"
   }
 }

@@ -11,15 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     name: A job to test the action
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
-    - name: Execute xpath-action
-      id: versions
+    - name: Execute action
+      id: run
       uses: ./
       with:
         filename: ./.github/workflows/info.xml
 
     - name: Get the result
       run: |
-        echo -e "Versions :\n${{ steps.xpath.versions.versions }}"
-        echo -e "Branches :\n${{ steps.xpath.versions.branches }}"
+        echo -e "Versions :\n${{ steps.xpath.run.versions }}"
+        echo -e "Branches :\n${{ steps.xpath.run.branches }}"

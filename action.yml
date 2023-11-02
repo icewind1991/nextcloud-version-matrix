@@ -11,4 +11,4 @@ outputs:
     description: 'List of branches for the supported nextcloud versions'
 runs:
   using: 'node20'
-  main: 'index.js'
+  main: 'dist/index.js'
