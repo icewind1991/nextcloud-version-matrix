@@ -4,8 +4,8 @@ const DOMParser = require('xmldom').DOMParser;
 const fs = require('fs');
 const urlExist = require('url-exist');
 
-function isVersionReleased(version) {
-    return urlExist(`https://download.nextcloud.com/server/releases/latest-${version}.zip`);
+function versionHashBranch(version) {
+    return urlExist(`https://github.com/nextcloud/server/tree/stable${version}`);
 }
 
 function range(from, to) {
@@ -31,7 +31,7 @@ function onlyUnique(value, index, array) {
         core.setOutput("versions", JSON.stringify(versions));
 
         const branches = await Promise.all(versions.map(async (version) => {
-            if (await isVersionReleased(version)) {
+            if (await versionHashBranch(version)) {
                 return `stable${version}`;
             } else {
                 return "master";

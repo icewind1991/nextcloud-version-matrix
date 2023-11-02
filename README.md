@@ -15,7 +15,7 @@ List of version number the app supports
 
 ### `branches`
 
-Branches for each supported version, either `stableXX` or `master` for versions that aren't released yet
+Branches for each supported version, either `stableXX` or `master` for versions that aren't branched yet.
 
 ## License
 [MIT License](LICENSE.md)
