@@ -1,0 +1,25 @@
+name: Test the action
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test_action:
+    runs-on: ubuntu-latest
+    name: A job to test the action
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Execute xpath-action
+      id: versions
+      uses: ./
+      with:
+        filename: ./.github/workflows/info.xml
+
+    - name: Get the result
+      run: |
+        echo -e "Versions :\n${{ steps.xpath.versions.versions }}"
+        echo -e "Branches :\n${{ steps.xpath.versions.branches }}"

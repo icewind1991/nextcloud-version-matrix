@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<info>
+  <dependencies>
+    <nextcloud min-version="25" max-version="29" />
+  </dependencies>
+</info>

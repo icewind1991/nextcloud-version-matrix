@@ -1,0 +1,14 @@
+name: 'Nextcloud version matrix'
+description: 'Generate nextcloud version matrix for an app'
+inputs:
+  filename:
+    description: 'The path to the appinfo.xml'
+    required: false
+outputs:
+  versions:
+    description: 'List of supported nextcloud versions'
+  branches:
+    description: 'List of branches for the supported nextcloud versions'
+runs:
+  using: 'node20'
+  main: 'index.js'
