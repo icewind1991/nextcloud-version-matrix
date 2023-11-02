@@ -9,6 +9,8 @@ outputs:
     description: 'List of supported nextcloud versions'
   branches:
     description: 'List of branches for the supported nextcloud versions'
+  matrix:
+    description: 'Test matrix with server branch and php version'
 runs:
   using: 'node20'
   main: 'dist/index.js'

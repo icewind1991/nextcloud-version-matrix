@@ -23,3 +23,4 @@ jobs:
       run: |
         echo -e "Versions :\n${{ steps.run.outputs.versions }}"
         echo -e "Branches :\n${{ steps.run.outputs.branches }}"
+        echo -e "Matrix :\n${{ steps.run.outputs.matrix }}"
