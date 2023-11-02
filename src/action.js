@@ -25,6 +25,8 @@ function onlyUnique(value, index, array) {
         const minVersion = parseInt(xpath.select1("//info//dependencies//nextcloud/@min-version", document).value, 10);
         const maxVersion = parseInt(xpath.select1("//info//dependencies//nextcloud/@max-version", document).value, 10);
 
+        console.log(`App supports from ${minVersion} till ${maxVersion}`);
+
         const versions = range(minVersion, maxVersion);
         core.setOutput("versions", JSON.stringify(versions));
 

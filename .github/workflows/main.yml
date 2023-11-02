@@ -21,5 +21,5 @@ jobs:
 
     - name: Get the result
       run: |
-        echo -e "Versions :\n${{ steps.xpath.run.versions }}"
-        echo -e "Branches :\n${{ steps.xpath.run.branches }}"
+        echo -e "Versions :\n${{ steps.run.outputs.versions }}"
+        echo -e "Branches :\n${{ steps.run.outputs.branches }}"
