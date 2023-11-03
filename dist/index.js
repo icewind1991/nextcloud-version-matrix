@@ -38817,6 +38817,7 @@ async function getSupportedVersions(branch) {
     let versionCheckCode = await res.readBody();
     let min = parseVersionId(versionCheckCode.match(/PHP_VERSION_ID < (\d+)/)[1]);
     let max = parseVersionId(versionCheckCode.match(/PHP_VERSION_ID >= (\d+)/)[1]);
+    max = parseFloat((max - 0.1).toFixed(1));
     return {min: min, max: max};
 }
 
@@ -38888,8 +38889,8 @@ function onlyUnique(value, index, array) {
         core.setOutput("branches", JSON.stringify(branches));
         core.setOutput("ocp-branches", JSON.stringify(branches.map(branch => `dev-${branch}`)));
         core.setOutput("php-versions", JSON.stringify(php));
-        core.setOutput("php-min", JSON.stringify([phpMin]));
-        core.setOutput("php-max", JSON.stringify([phpMax]));
+        core.setOutput("php-min", JSON.stringify([php[0]]));
+        core.setOutput("php-max", JSON.stringify([php.pop()]));
         core.setOutput("branches-min", JSON.stringify([branches[0]]));
         core.setOutput("branches-max", JSON.stringify([branches.pop()]));
         core.setOutput("matrix", JSON.stringify({
