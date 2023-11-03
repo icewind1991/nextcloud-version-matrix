@@ -160,6 +160,15 @@ function copy(obj) {
             include: matrix
         }));
 
+        core.setOutput("ocp-matrix", JSON.stringify({
+            include: matrix.map(row => {
+                const ocpVersion = `dev-${row["server-versions"]}`;
+                delete row["server-versions"];
+                row["ocp-version"] = ocpVersion;
+                return row;
+            })
+        }));
+
     } catch (error) {
         core.setFailed(error.message);
     }
