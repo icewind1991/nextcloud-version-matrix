@@ -38888,6 +38888,10 @@ function onlyUnique(value, index, array) {
         core.setOutput("branches", JSON.stringify(branches));
         core.setOutput("ocp-branches", JSON.stringify(branches.map(branch => `dev-${branch}`)));
         core.setOutput("php-versions", JSON.stringify(php));
+        core.setOutput("php-min", JSON.stringify([phpMin]));
+        core.setOutput("php-max", JSON.stringify([phpMax]));
+        core.setOutput("branches-min", JSON.stringify([branches[0]]));
+        core.setOutput("branches-max", JSON.stringify([branches.pop()]));
         core.setOutput("matrix", JSON.stringify({
             include: matrix
         }));
