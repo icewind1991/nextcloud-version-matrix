@@ -38812,6 +38812,7 @@ function range(from, to) {
 }
 
 async function getSupportedVersions(branch) {
+    // yes, this is hacky, but it saves having to keep a list updated
     let res = await client.get(`https://raw.githubusercontent.com/nextcloud/server/${branch}/lib/versioncheck.php`);
     let versionCheckCode = await res.readBody();
     let min = parseVersionId(versionCheckCode.match(/PHP_VERSION_ID < (\d+)/)[1]);
@@ -38822,6 +38823,14 @@ async function getSupportedVersions(branch) {
 function parseVersionId(raw) {
     let matches = raw.match(/^(\d\d)(\d)/)
     return parseInt(matches[1], 10) / 10 + parseInt(matches[2], 10) / 10
+}
+
+async function getAllPhpVersions() {
+    // again hacky, but gives a nicely always-up-to-date list
+    let res = await client.get(`https://www.php.net/releases/`);
+    let releasesHtml = await res.readBody();
+    let matches = [...releasesHtml.matchAll(/<h2>(\d+\.\d+\.\d+)<\/h2>/g)];
+    return matches.map(match => match[1]);
 }
 
 function onlyUnique(value, index, array) {
@@ -38841,21 +38850,44 @@ function onlyUnique(value, index, array) {
 
         const versions = range(minVersion, maxVersion);
 
-        const matrix = await Promise.all(versions.map(async (version) => {
+        const versionData= await Promise.all(versions.map(async (version) => {
             const branch = await getBranch(version);
             const php = await getSupportedVersions(branch);
             return {
-                "php-versions": php.min.toFixed(1),
-                "server-versions": branch,
+                "phpMin": php.min,
+                "phpMax": php.max,
+                "branch": branch,
             }
+        }));
+        // parseFloat will ignore patch versions, leaving us with all major and minor releases
+        const possiblePhpVersions = (await getAllPhpVersions()).map(parseFloat).filter(onlyUnique);
+
+        const matrix = versionData.map(data => ({
+            "php-versions": data.phpMin.toFixed(1),
+            "server-versions": data.branch,
         }));
 
         core.setOutput("versions", JSON.stringify(versions));
 
-        const branches = matrix.map(matrix => matrix["server-versions"]).filter(onlyUnique);
+        const branches = versionData.map(data => data.branch).filter(onlyUnique);
+
+        const phpMin = Math.min(...versionData.map(data => data.phpMin));
+        const phpMax = Math.max(...versionData.map(data => data.phpMax));
+
+        console.log(`App supports from php ${phpMin.toFixed(1)} till php ${phpMax.toFixed(1)}`);
+
+        const php = [];
+        for(let version = phpMin; version <= phpMax; version += 0.1) {
+            // floats are a pain
+            version = parseFloat(version.toFixed(1));
+            if (possiblePhpVersions.includes(version)) {
+                php.push(version.toFixed(1));
+            }
+        }
 
         core.setOutput("branches", JSON.stringify(branches));
         core.setOutput("ocp-branches", JSON.stringify(branches.map(branch => `dev-${branch}`)));
+        core.setOutput("php-versions", JSON.stringify(php));
         core.setOutput("matrix", JSON.stringify({
             include: matrix
         }));
