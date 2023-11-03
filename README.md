@@ -9,13 +9,57 @@ Get a version matrix of server versions to test the app against
 
 ## Outputs
 
+### `matrix`
+
+Test matrix with server branch and php version
+
 ### `versions`
 
-List of version number the app supports
+List of supported nextcloud versions
 
 ### `branches`
 
-Branches for each supported version, either `stableXX` or `master` for versions that aren't branched yet.
+List of branches for the supported nextcloud versions
+
+### `ocp-branches`
+
+List of branches for the supported nextcloud/ocp versions
+
+### `php-versions`
+
+List of supported php versions
+
+### `php-max`
+
+Maximum supported php version
+
+### `php-min`
+
+Minimum supported php version
+
+### `php-max-list`
+
+Maximum supported php version, as a single-item list
+
+### `php-min-list`
+
+Minimum supported php version, as a single-item list
+
+### `branches-max`
+
+Maximum supported server version
+
+### `branches-min`
+
+Minimum supported server version
+
+### `branches-max-list`
+
+Maximum supported server version, as a single-item list
+
+### `branches-min-list`
+
+Minimum supported server version, as a single-item list
 
 ## License
 [MIT License](LICENSE.md)

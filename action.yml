@@ -5,12 +5,32 @@ inputs:
     description: 'The path to the appinfo.xml'
     required: false
 outputs:
+  matrix:
+    description: 'Test matrix with server branch and php version'
   versions:
     description: 'List of supported nextcloud versions'
   branches:
     description: 'List of branches for the supported nextcloud versions'
-  matrix:
-    description: 'Test matrix with server branch and php version'
+  ocp-branches:
+    description: 'List of branches for the supported nextcloud/ocp versions'
+  php-versions:
+    description: 'List of supported php versions'
+  php-max:
+    description: 'Maximum supported php version'
+  php-min:
+    description: 'Minimum supported php version'
+  php-max-list:
+    description: 'Maximum supported php version, as a single-item list'
+  php-min-list:
+    description: 'Minimum supported php version, as a single-item list'
+  branches-max:
+    description: 'Maximum supported server version'
+  branches-min:
+    description: 'Minimum supported server version'
+  branches-max-list:
+    description: 'Maximum supported server version, as a single-item list'
+  branches-min-list:
+    description: 'Minimum supported server version, as a single-item list'
 runs:
   using: 'node20'
   main: 'dist/index.js'
