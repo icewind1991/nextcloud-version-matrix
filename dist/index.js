@@ -38852,9 +38852,10 @@ function onlyUnique(value, index, array) {
 
         core.setOutput("versions", JSON.stringify(versions));
 
-        const branches = matrix.map(matrix => matrix["server-versions"]);
+        const branches = matrix.map(matrix => matrix["server-versions"]).filter(onlyUnique);
 
-        core.setOutput("branches", JSON.stringify(branches.filter(onlyUnique)));
+        core.setOutput("branches", JSON.stringify(branches));
+        core.setOutput("ocp-branches", JSON.stringify(branches.map(branch => `dev-${branch}`)));
         core.setOutput("matrix", JSON.stringify({
             include: matrix
         }));
