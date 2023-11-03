@@ -101,10 +101,17 @@ function onlyUnique(value, index, array) {
         core.setOutput("branches", JSON.stringify(branches));
         core.setOutput("ocp-branches", JSON.stringify(branches.map(branch => `dev-${branch}`)));
         core.setOutput("php-versions", JSON.stringify(php));
-        core.setOutput("php-min", JSON.stringify([php[0]]));
-        core.setOutput("php-max", JSON.stringify([php.pop()]));
-        core.setOutput("branches-min", JSON.stringify([branches[0]]));
-        core.setOutput("branches-max", JSON.stringify([branches.pop()]));
+
+        core.setOutput("php-min-list", JSON.stringify([php[0]]));
+        core.setOutput("php-max-list", JSON.stringify([php[php.length - 1]]));
+        core.setOutput("branches-min-list", JSON.stringify([branches[0]]));
+        core.setOutput("branches-max-list", JSON.stringify([branches[branches.length - 1]]));
+
+        core.setOutput("php-min", php[0]);
+        core.setOutput("php-max", php[php.length - 1]);
+        core.setOutput("branches-min", branches[0]);
+        core.setOutput("branches-max", branches[branches.length - 1]);
+
         core.setOutput("matrix", JSON.stringify({
             include: matrix
         }));
