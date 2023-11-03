@@ -4,6 +4,11 @@ inputs:
   filename:
     description: 'The path to the appinfo.xml'
     required: false
+    default: 'appinfo/info.xml'
+  matrix:
+    description: 'Other fields to include in the output matrix, json encoded'
+    required: false
+    default: '{}'
 outputs:
   matrix:
     description: 'Test matrix with server branch and php version'

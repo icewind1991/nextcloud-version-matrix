@@ -7,6 +7,10 @@ Get a version matrix of server versions to test the app against
 ### `filename`
 **Optional** The path to the `info.xml` for the app, defaults to `appinfo/info.xml`.
 
+### `matrix`
+
+**Optional** Other fields to include in the output matrix, json encoded
+
 ## Outputs
 
 ### `matrix`

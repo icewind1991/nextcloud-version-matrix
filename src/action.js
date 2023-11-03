@@ -50,9 +50,49 @@ function onlyUnique(value, index, array) {
     return array.indexOf(value) === index;
 }
 
+function cartesianProduct(input) {
+    const inputArray = [];
+    for (let key of Object.keys(input)) {
+        const item = {};
+        item[key] = input[key];
+        inputArray.push(item);
+    }
+    return cartesianProductInner(inputArray);
+}
+
+// https://stackoverflow.com/a/18959668
+function cartesianProductInner(input, current) {
+    if (!input || !input.length) { return []; }
+
+    let head = input[0];
+    let tail = input.slice(1);
+    let output = [];
+
+    for (let key in head) {
+        for (let i = 0; i < head[key].length; i++) {
+            let newCurrent = copy(current);
+            newCurrent[key] = head[key][i];
+            if (tail.length) {
+                let productOfTail =
+                    cartesianProductInner(tail, newCurrent);
+                output = output.concat(productOfTail);
+            } else output.push(newCurrent);
+        }
+    }
+    return output;
+}
+
+function copy(obj) {
+    let res = {};
+    for (let p in obj) res[p] = obj[p];
+    return res;
+}
+
+
 (async () => {
     try {
         const filename = core.getInput('filename') || 'appinfo/info.xml';
+        const matrixInput = JSON.parse(core.getInput('matrix') || '{}');
 
         const content = fs.readFileSync(filename, 'utf8');
         const document = new DOMParser().parseFromString(content);
@@ -75,10 +115,14 @@ function onlyUnique(value, index, array) {
         // parseFloat will ignore patch versions, leaving us with all major and minor releases
         const possiblePhpVersions = (await getAllPhpVersions()).map(parseFloat).filter(onlyUnique);
 
-        const matrix = versionData.map(data => ({
-            "php-versions": data.phpMin.toFixed(1),
-            "server-versions": data.branch,
-        }));
+        const matrix = cartesianProduct({
+            "server-versions": versionData.map(data => data.branch),
+            ...matrixInput
+        });
+        matrix.forEach(row => {
+            const phpMax = versionData.find(data => data.branch === row["server-versions"]).phpMax;
+            row["php-versions"] = phpMax.toFixed(1);
+        });
 
         core.setOutput("versions", JSON.stringify(versions));
 
