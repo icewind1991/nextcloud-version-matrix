@@ -15,7 +15,16 @@ Get a version matrix of server versions to test the app against
 
 ### `matrix`
 
-Test matrix with server branch and php version
+Test matrix covering all server versions
+### `php-matrix`
+
+Test matrix covering all php versions
+### `sparse-matrix`
+
+Test matrix covering all php and server versions with minimal redundancy
+### `full-matrix`
+
+Test matrix covering all php and server version combinations
 
 ### `versions`
 

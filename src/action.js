@@ -150,8 +150,18 @@ function copy(obj) {
         phpMatrix.forEach(row => {
             const php = row['php-versions'];
             const candidateVersion = versionData.findLast(data => data.phpMin <= php && data.phpMax >= php);
-            console.log(php, candidateVersion);
             row["server-versions"] = candidateVersion.branch;
+        });
+
+        // matrix with every php and server combination
+        const fullMatrix = cartesianProduct({
+            "server-versions": versionData.map(data => data.branch),
+            "php-versions": php,
+            ...matrixInput
+        }).filter(row => {
+            const php = row['php-versions'];
+            const version = versionData.find(version => version.branch === row['server-versions']);
+            return version.phpMin <= php && version.phpMax >= php;
         });
 
         // matrix with at least one item for every server and php version
@@ -176,8 +186,11 @@ function copy(obj) {
         core.setOutput("matrix", JSON.stringify({
             include: serverMatrix
         }));
-        core.setOutput("test-matrix", JSON.stringify({
+        core.setOutput("sparse-matrix", JSON.stringify({
             include: testMatrix
+        }));
+        core.setOutput("full-matrix", JSON.stringify({
+            include: fullMatrix
         }));
 
         core.setOutput("ocp-matrix", JSON.stringify({

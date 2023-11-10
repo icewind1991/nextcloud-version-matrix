@@ -11,7 +11,13 @@ inputs:
     default: '{}'
 outputs:
   matrix:
-    description: 'Test matrix with server branch and php version'
+    description: 'Test matrix covering all server versions'
+  php-matrix:
+    description: 'Test matrix covering all php versions'
+  sparse-matrix:
+    description: 'Test matrix covering all php and server versions with minimal redundancy'
+  full-matrix:
+    description: 'Test matrix covering all php and server version combinations'
   versions:
     description: 'List of supported nextcloud versions'
   branches:
