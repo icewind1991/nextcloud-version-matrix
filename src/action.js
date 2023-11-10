@@ -4,6 +4,7 @@ const DOMParser = require('xmldom').DOMParser;
 const fs = require('fs');
 const urlExist = require('url-exist');
 const {HttpClient} = require('@actions/http-client');
+const equal = require('deep-equal');
 
 const client = new HttpClient('nextcloud-version-matrix')
 
@@ -47,7 +48,7 @@ async function getAllPhpVersions() {
 }
 
 function onlyUnique(value, index, array) {
-    return array.indexOf(value) === index;
+    return array.findIndex(item => equal(value, item)) === index;
 }
 
 function cartesianProduct(input) {
@@ -115,11 +116,12 @@ function copy(obj) {
         // parseFloat will ignore patch versions, leaving us with all major and minor releases
         const possiblePhpVersions = (await getAllPhpVersions()).map(parseFloat).filter(onlyUnique);
 
-        const matrix = cartesianProduct({
+        // matrix with a single php version per server version
+        const serverMatrix = cartesianProduct({
             "server-versions": versionData.map(data => data.branch),
             ...matrixInput
         });
-        matrix.forEach(row => {
+        serverMatrix.forEach(row => {
             const phpMax = versionData.find(data => data.branch === row["server-versions"]).phpMax;
             row["php-versions"] = phpMax.toFixed(1);
         });
@@ -131,8 +133,6 @@ function copy(obj) {
         const phpMin = Math.min(...versionData.map(data => data.phpMin));
         const phpMax = Math.max(...versionData.map(data => data.phpMax));
 
-        console.log(`App supports from php ${phpMin.toFixed(1)} till php ${phpMax.toFixed(1)}`);
-
         const php = [];
         for(let version = phpMin; version <= phpMax; version += 0.1) {
             // floats are a pain
@@ -141,6 +141,23 @@ function copy(obj) {
                 php.push(version.toFixed(1));
             }
         }
+
+        // matrix with a single server version per php version
+        const phpMatrix = cartesianProduct({
+            "php-versions": php,
+            ...matrixInput
+        });
+        phpMatrix.forEach(row => {
+            const php = row['php-versions'];
+            const candidateVersion = versionData.findLast(data => data.phpMin <= php && data.phpMax >= php);
+            console.log(php, candidateVersion);
+            row["server-versions"] = candidateVersion.branch;
+        });
+
+        // matrix with at least one item for every server and php version
+        let testMatrix = phpMatrix.concat(serverMatrix).filter(onlyUnique);
+
+        console.log(`App supports from php ${phpMin.toFixed(1)} till php ${phpMax.toFixed(1)}`);
 
         core.setOutput("branches", JSON.stringify(branches));
         core.setOutput("ocp-branches", JSON.stringify(branches.map(branch => `dev-${branch}`)));
@@ -157,11 +174,14 @@ function copy(obj) {
         core.setOutput("branches-max", branches[branches.length - 1]);
 
         core.setOutput("matrix", JSON.stringify({
-            include: matrix
+            include: serverMatrix
+        }));
+        core.setOutput("test-matrix", JSON.stringify({
+            include: testMatrix
         }));
 
         core.setOutput("ocp-matrix", JSON.stringify({
-            include: matrix.map(row => {
+            include: serverMatrix.map(row => {
                 const ocpVersion = `dev-${row["server-versions"]}`;
                 delete row["server-versions"];
                 row["ocp-version"] = ocpVersion;
