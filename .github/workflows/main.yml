@@ -22,5 +22,6 @@ jobs:
     - name: Get the result
       run: |
         echo -e "Versions :\n${{ steps.run.outputs.versions }}"
+        echo -e "Available PHP :\n${{ steps.run.outputs.php-available }}"
         echo -e "Branches :\n${{ steps.run.outputs.branches }}"
         echo -e "Matrix :\n${{ steps.run.outputs.matrix }}"

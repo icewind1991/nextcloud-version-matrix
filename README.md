@@ -50,6 +50,10 @@ Maximum supported php version
 
 Minimum supported php version
 
+### `php-available`
+
+Maximum supported php version that is available in the runner
+
 ### `php-max-list`
 
 Maximum supported php version, as a single-item list
@@ -57,6 +61,10 @@ Maximum supported php version, as a single-item list
 ### `php-min-list`
 
 Minimum supported php version, as a single-item list
+
+### `php-available-list`
+
+Maximum supported php version that is available in the runner, as a single-item list
 
 ### `branches-max`
 

@@ -5,6 +5,8 @@ const fs = require('fs');
 const urlExist = require('url-exist');
 const {HttpClient} = require('@actions/http-client');
 const equal = require('deep-equal');
+const { promisify } = require('util');
+const exec = promisify(require('child_process').exec)
 
 const client = new HttpClient('nextcloud-version-matrix')
 
@@ -45,6 +47,15 @@ async function getAllPhpVersions() {
     let releasesHtml = await res.readBody();
     let matches = [...releasesHtml.matchAll(/<h2>(\d+\.\d+\.\d+)<\/h2>/g)];
     return matches.map(match => match[1]);
+}
+
+async function distroSupportsPhpVersion(version) {
+    try {
+        const output = await exec(`apt-cache policy php${version}`);
+        return output.stdout.includes("Candidate")
+    } catch (_e) {
+        return false;
+    }
 }
 
 function onlyUnique(value, index, array) {
@@ -142,6 +153,15 @@ function copy(obj) {
             }
         }
 
+        const distroPhp = [];
+        let availablePhp = phpMax;
+        for(let version of php) {
+            if (await distroSupportsPhpVersion(version)) {
+                distroPhp.push(version)
+                availablePhp = version;
+            }
+        }
+
         // matrix with a single server version per php version
         const phpMatrix = cartesianProduct({
             "php-versions": php,
@@ -175,11 +195,13 @@ function copy(obj) {
 
         core.setOutput("php-min-list", JSON.stringify([php[0]]));
         core.setOutput("php-max-list", JSON.stringify([php[php.length - 1]]));
+        core.setOutput("php-available-list", JSON.stringify([availablePhp]));
         core.setOutput("branches-min-list", JSON.stringify([branches[0]]));
         core.setOutput("branches-max-list", JSON.stringify([branches[branches.length - 1]]));
 
         core.setOutput("php-min", php[0]);
         core.setOutput("php-max", php[php.length - 1]);
+        core.setOutput("php-available", availablePhp);
         core.setOutput("branches-min", branches[0]);
         core.setOutput("branches-max", branches[branches.length - 1]);
 
