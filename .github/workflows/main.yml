@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     name: A job to test the action
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Execute action
       id: run
