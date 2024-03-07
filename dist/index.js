@@ -42555,12 +42555,8 @@ function parseVersionId(raw) {
     return parseInt(matches[1], 10) / 10 + parseInt(matches[2], 10) / 10
 }
 
-async function getAllPhpVersions() {
-    // again hacky, but gives a nicely always-up-to-date list
-    let res = await client.get(`https://www.php.net/releases/`);
-    let releasesHtml = await res.readBody();
-    let matches = [...releasesHtml.matchAll(/<h2>(\d+\.\d+\.\d+)<\/h2>/g)];
-    return matches.map(match => match[1]);
+async function isPhpVersionReleased(version) {
+    return await urlExist(`https://github.com/php/php-src/releases/tag/php-${version.toFixed(1)}.0`);
 }
 
 async function distroSupportsPhpVersion(version) {
@@ -42629,7 +42625,8 @@ function copy(obj) {
 
         const versions = range(minVersion, maxVersion);
 
-        const versionData= await Promise.all(versions.map(async (version) => {
+        // we reverse the order to put highest version first for the "branched off check"
+        const versionData= (await Promise.all(versions.reverse().map(async (version) => {
             const branch = await getBranch(version);
             const php = await getSupportedVersions(branch);
             return {
@@ -42637,9 +42634,7 @@ function copy(obj) {
                 "phpMax": php.max,
                 "branch": branch,
             }
-        }));
-        // parseFloat will ignore patch versions, leaving us with all major and minor releases
-        const possiblePhpVersions = (await getAllPhpVersions()).map(parseFloat).filter(onlyUnique);
+        }))).reverse();
 
         // matrix with a single php version per server version
         const serverMatrix = cartesianProduct({
@@ -42662,8 +42657,11 @@ function copy(obj) {
         for(let version = phpMin; version <= phpMax; version += 0.1) {
             // floats are a pain
             version = parseFloat(version.toFixed(1));
-            if (possiblePhpVersions.includes(version)) {
+            if (await isPhpVersionReleased(version)) {
                 php.push(version.toFixed(1));
+            } else {
+                // no more minors for this major
+                version = Math.ceil(version) - 0.1;
             }
         }
 
