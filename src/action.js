@@ -30,8 +30,14 @@ async function getSupportedVersions(branch) {
     // yes, this is hacky, but it saves having to keep a list updated
     let res = await client.get(`https://raw.githubusercontent.com/nextcloud/server/${branch}/lib/versioncheck.php`);
     let versionCheckCode = await res.readBody();
-    let min = parseVersionId(versionCheckCode.match(/PHP_VERSION_ID < (\d+)/)[1]);
-    let max = parseVersionId(versionCheckCode.match(/PHP_VERSION_ID >= (\d+)/)[1]);
+    let min, max;
+    if (versionCheckCode.match(/PHP_VERSION_ID < (\d+)/)) {
+        min = parseVersionId(versionCheckCode.match(/PHP_VERSION_ID < (\d+)/)[1]);
+        max = parseVersionId(versionCheckCode.match(/PHP_VERSION_ID >= (\d+)/)[1]);
+    } else {
+        min = parseFloat(versionCheckCode.match(/PHP_VERSION, '([\d.]+)'\) === -1/)[1]);
+        max = parseFloat(versionCheckCode.match(/PHP_VERSION, '([\d.]+)'\) !== -1/)[1]);
+    }
     max = parseFloat((max - 0.1).toFixed(1));
     return {min: min, max: max};
 }
