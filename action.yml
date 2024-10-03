@@ -9,6 +9,10 @@ inputs:
     description: 'Other fields to include in the output matrix, json encoded'
     required: false
     default: '{}'
+  with_php:
+    description: 'Extra php versions to use, either a single string or json array. These will be included in the matrix with the "master" server branch'
+    required: false
+    default: '[]'
 outputs:
   matrix:
     description: 'Test matrix covering all server versions'

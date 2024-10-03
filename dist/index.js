@@ -42621,6 +42621,14 @@ function copy(obj) {
     try {
         const filename = core.getInput('filename') || 'appinfo/info.xml';
         const matrixInput = JSON.parse(core.getInput('matrix') || '{}');
+        const withPhpInput = core.getInput('with_php') || '[]';
+        console.log(withPhpInput);
+        let withPhp = [];
+        if (withPhpInput.startsWith('[') && withPhpInput.endsWith(']')) {
+            withPhp = JSON.parse(withPhpInput);
+        } else {
+            withPhp = [withPhpInput];
+        }
 
         const content = fs.readFileSync(filename, 'utf8');
         const document = new DOMParser().parseFromString(content);
@@ -42651,6 +42659,12 @@ function copy(obj) {
             const phpMax = versionData.find(data => data.branch === row["server-versions"]).phpMax;
             row["php-versions"] = phpMax.toFixed(1);
         });
+        for (let extraPhpVersion of withPhp) {
+            serverMatrix.push({
+                "php-versions": extraPhpVersion,
+                "server-versions": "master",
+            });
+        }
 
         core.setOutput("versions", JSON.stringify(versions));
 
@@ -42659,7 +42673,7 @@ function copy(obj) {
         const phpMin = Math.min(...versionData.map(data => data.phpMin));
         const phpMax = Math.max(...versionData.map(data => data.phpMax));
 
-        const php = [];
+        const php = withPhp.concat([]); // clone, not alias
         for(let version = phpMin; version <= phpMax; version += 0.1) {
             // floats are a pain
             version = parseFloat(version.toFixed(1));
@@ -42670,6 +42684,7 @@ function copy(obj) {
                 version = Math.ceil(version) - 0.1;
             }
         }
+        php.sort();
 
         const distroPhp = [];
         let availablePhp = phpMax;
@@ -42688,7 +42703,7 @@ function copy(obj) {
         phpMatrix.forEach(row => {
             const php = row['php-versions'];
             const candidateVersion = versionData.findLast(data => data.phpMin <= php && data.phpMax >= php);
-            row["server-versions"] = candidateVersion.branch;
+            row["server-versions"] = candidateVersion?.branch ?? "master";
         });
 
         // matrix with every php and server combination
@@ -42701,6 +42716,12 @@ function copy(obj) {
             const version = versionData.find(version => version.branch === row['server-versions']);
             return version.phpMin <= php && version.phpMax >= php;
         });
+        for (let extraPhpVersion of withPhp) {
+            fullMatrix.push({
+                "php-versions": extraPhpVersion,
+                "server-versions": "master",
+            });
+        }
 
         // matrix with at least one item for every server and php version
         let testMatrix = phpMatrix.concat(serverMatrix).filter(onlyUnique);
