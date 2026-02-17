@@ -42616,6 +42616,19 @@ function copy(obj) {
     return res;
 }
 
+// Formatted according to PHP_VERSION_ID
+function getPHPVersionID(version) {
+    const parts = version.split('.');
+    let value = parseInt(parts[0]) * 10000;
+    if (parts.length > 1) {
+        value += parseInt(parts[1]) * 100;
+    }
+    if (parts.length > 2) {
+        value += parseInt(parts[2]);
+    }
+    return value.toString();
+}
+
 
 (async () => {
     try {
@@ -42745,7 +42758,9 @@ function copy(obj) {
         core.setOutput("branches-max-list", JSON.stringify([branches[branches.length - 1]]));
 
         core.setOutput("php-min", php[0]);
+        core.setOutput("php-min-id", getPHPVersionID(php[0]));
         core.setOutput("php-max", php[php.length - 1]);
+        core.setOutput("php-max-id", getPHPVersionID(php[php.length - 1]));
         core.setOutput("php-available", availablePhp);
         core.setOutput("branches-min", branches[0]);
         core.setOutput("branches-max", branches[branches.length - 1]);
