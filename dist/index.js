@@ -42679,9 +42679,11 @@ function copy(obj) {
             version = parseFloat(version.toFixed(1));
             if (await isPhpVersionReleased(version)) {
                 php.push(version.toFixed(1));
+                console.log(`Release for PHP Version ${version.toFixed(1)} exists`);
             } else {
                 // no more minors for this major
                 version = Math.ceil(version) - 0.1;
+                console.log(`No release for PHP Version ${version.toFixed(1)} exists -> skipping`);
             }
         }
         php.sort();
@@ -42692,6 +42694,10 @@ function copy(obj) {
             if (await distroSupportsPhpVersion(version)) {
                 distroPhp.push(version)
                 availablePhp = version;
+
+                console.log(`Install candidates for PHP Version ${version} found`);
+            } else {
+                console.log(`No install candidates for PHP version ${version} found -> skipping`);
             }
         }
 
@@ -42764,6 +42770,7 @@ function copy(obj) {
         }));
 
     } catch (error) {
+        console.error(error);
         core.setFailed(error.message);
     }
 })()

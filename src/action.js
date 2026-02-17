@@ -181,9 +181,9 @@ function copy(obj) {
                 distroPhp.push(version)
                 availablePhp = version;
 
-                console.log(`Install candidates for PHP Version ${version.toFixed(1)} found`);
+                console.log(`Install candidates for PHP Version ${version} found`);
             } else {
-                console.log(`No install candidates for PHP version ${version.toFixed(1)} found -> skipping`);
+                console.log(`No install candidates for PHP version ${version} found -> skipping`);
             }
         }
 
@@ -256,6 +256,7 @@ function copy(obj) {
         }));
 
     } catch (error) {
+        console.error(error);
         core.setFailed(error.message);
     }
 })()
