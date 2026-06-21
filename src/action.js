@@ -131,23 +131,28 @@ function getPHPVersionID(version) {
 
         const content = fs.readFileSync(filename, 'utf8');
         const document = new DOMParser().parseFromString(content);
-        const minVersion = parseInt(xpath.select1("//info//dependencies//nextcloud/@min-version", document).value, 10);
-        const maxVersion = parseInt(xpath.select1("//info//dependencies//nextcloud/@max-version", document).value, 10);
+        const nextcloudMinVersion = parseInt(xpath.select1("//info//dependencies//nextcloud/@min-version", document).value, 10);
+        const nextcloudMaxVersion = parseInt(xpath.select1("//info//dependencies//nextcloud/@max-version", document).value, 10);
 
-        console.log(`App supports from ${minVersion} till ${maxVersion}`);
+        const phpMinVersion = parseFloat(xpath.select1("//info//dependencies//php/@min-version", document)?.value);
+        const phpMaxVersion = parseFloat(xpath.select1("//info//dependencies//php/@max-version", document)?.value);
 
-        const versions = range(minVersion, maxVersion);
+        console.log(`App supports Nextcloud ${nextcloudMinVersion} till ${nextcloudMaxVersion}`);
+        console.log(`App supports PHP ${phpMinVersion} till ${phpMaxVersion} (NaN = no range limit specified)`);
+
+        const versions = range(nextcloudMinVersion, nextcloudMaxVersion);
 
         // we reverse the order to put highest version first for the "branched off check"
-        const versionData= (await Promise.all(versions.reverse().map(async (version) => {
+        let versionData = (await Promise.all(versions.reverse().map(async (version) => {
             const branch = await getBranch(version);
-            const php = await getSupportedVersions(branch);
+            const phpVersionRange = await getSupportedVersions(branch);
             return {
-                "phpMin": php.min,
-                "phpMax": php.max,
+                "phpMin": isNaN(phpMinVersion) ? phpVersionRange.min : Math.max(phpVersionRange.min, phpMinVersion),
+                "phpMax": isNaN(phpMaxVersion) ? phpVersionRange.max : Math.min(phpVersionRange.max, phpMaxVersion),
                 "branch": branch,
             }
         }))).reverse();
+        versionData = versionData.filter(data => data.phpMin <= data.phpMax);
 
         // matrix with a single php version per server version
         const serverMatrix = cartesianProduct({
