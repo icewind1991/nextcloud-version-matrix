@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <info>
   <dependencies>
-    <nextcloud min-version="25" max-version="29" />
+    <php max-version="8.1" />
+    <nextcloud min-version="27" max-version="33" />
   </dependencies>
 </info>
