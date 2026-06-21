@@ -17,7 +17,7 @@
       # `nix develop`
       devShell = pkgs.mkShell {
         nativeBuildInputs = with pkgs; [
-            nodejs_20
+            nodejs_24
         ];
       };
     });

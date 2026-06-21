@@ -47,5 +47,5 @@ outputs:
   branches-min-list:
     description: 'Minimum supported server version, as a single-item list'
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/index.js'
