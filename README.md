@@ -85,7 +85,7 @@ Minimum supported server version, as a single-item list
 ## Building
 
 - `npm ci`
-- `./node_modules/.bin/ncc build src/action.js -o dist`
+- `./node_modules/.bin/ncc build src/action.mjs -o dist`
 
 ## License
 [MIT License](LICENSE.md)

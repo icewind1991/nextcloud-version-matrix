@@ -1,12 +1,11 @@
-const core = require('@actions/core');
-const xpath = require('xpath');
-const DOMParser = require('xmldom').DOMParser;
-const fs = require('fs');
-const urlExist = require('url-exist');
-const {HttpClient} = require('@actions/http-client');
-const equal = require('deep-equal');
-const { promisify } = require('util');
-const exec = promisify(require('child_process').exec)
+import * as core from '@actions/core'
+import xpath from 'xpath'
+import {DOMParser} from '@xmldom/xmldom'
+import fs from 'fs'
+import urlExist from 'url-exist'
+import equal from 'deep-equal'
+import {getExecOutput} from '@actions/exec'
+import {HttpClient} from '@actions/http-client'
 
 const client = new HttpClient('nextcloud-version-matrix')
 
@@ -53,7 +52,7 @@ async function isPhpVersionReleased(version) {
 
 async function distroSupportsPhpVersion(version) {
     try {
-        const output = await exec(`apt-cache policy php${version}`);
+        const output = await getExecOutput('apt-cache', ['policy', `php${version}`], {silent: true});
         return output.stdout.includes("Candidate")
     } catch (_e) {
         return false;
@@ -130,7 +129,7 @@ function getPHPVersionID(version) {
         }
 
         const content = fs.readFileSync(filename, 'utf8');
-        const document = new DOMParser().parseFromString(content);
+        const document = new DOMParser().parseFromString(content, 'text/xml');
         const nextcloudMinVersion = parseInt(xpath.select1("//info//dependencies//nextcloud/@min-version", document).value, 10);
         const nextcloudMaxVersion = parseInt(xpath.select1("//info//dependencies//nextcloud/@max-version", document).value, 10);
 
